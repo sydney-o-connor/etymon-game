@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etymon — The Linguistic Arboreum</title>
+  <!-- Google Fonts: Fraunces (warm retro serif), Newsreader (editorial italic), JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-parchment: #F7F3E9;
+      --bg-card: #FCFAF5;
+      --border-ink: #2C3529;
+      --ink-primary: #1C241B;
+      --ink-muted: #5A6656;
+      --forest-dark: #2F482B;
+      --forest-mid: #4F7243;
+      --sage-light: #E3EEDC;
+      --sage-accent: #789B66;
+      --terracotta: #BA4E36;
+      --terracotta-soft: #F6EAE7;
+      --gold-accent: #C78B2D;
+      --shadow-retro: 3px 3px 0px var(--border-ink);
+      --shadow-sm: 2px 2px 0px var(--border-ink);
+      --shadow-active: 4px 4px 0px var(--forest-dark);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-parchment);
+      color: var(--ink-primary);
+      font-family: 'Newsreader', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: 
+        radial-gradient(#D6CEC2 0.75px, transparent 0.75px),
+        linear-gradient(to right, rgba(44, 53, 41, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px, 40px 40px;
+      overflow-x: hidden;
+    }
+
+    /* Top Masthead */
+    header {
+      width: 100%;
+      max-width: 880px;
+      padding: 16px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--border-ink);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-family: 'Fraunces', serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--forest-dark);
+    }
+
+    .specimen-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: var(--terracotta);
+      color: #FFF;
+      padding: 3px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      box-shadow: 1px 1px 0px var(--border-ink);
+    }
+
+    .header-ctrls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-field-icon {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-ink);
+      box-shadow: var(--shadow-sm);
+      color: var(--ink-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.1s ease;
+    }
+
+    .btn-field-icon:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--border-ink);
+      background: #FFF;
+    }
+
+    .btn-field-icon:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-ink);
+    }
+
+    /* Main Container */
+    main {
+      width: 100%;
+      max-width: 880px;
+      padding: 14px 18px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    /* Botanical Nursery Panel */
+    .nursery-viewport {
+      position: relative;
+      background: var(--bg-card);
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-retro);
+      border-radius: 6px;
+      padding: 14px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .nursery-badge {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--ink-muted);
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .canopy-stats-dock {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .stat-capsule {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #EDE6D6;
+      padding: 3px 9px;
+      border: 1px solid var(--border-ink);
+      border-radius: 3px;
+    }
+
+    .stat-val {
+      font-weight: 700;
+      color: var(--forest-dark);
+    }
+
+    .tree-stage {
+      width: 100%;
+      height: 195px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      margin-top: 10px;
+    }
+
+    #treeSvg {
+      width: 100%;
+      max-width: 500px;
+      height: 100%;
+      overflow: visible;
+      transition: all 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    /* Ancient Root Banner */
+    .root-pedestal {
+      margin-top: 4px;
+      text-align: center;
+      background: #ECE5D5;
+      border: 1.5px solid var(--border-ink);
+      padding: 6px 18px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 1px 1px 0px var(--border-ink);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .root-lang-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #FFF;
+      background: var(--forest-mid);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .root-spelling {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--forest-dark);
+      letter-spacing: 0.5px;
+    }
+
+    .root-gloss {
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 15px;
+    }
+
+    /* Target Branch Offshoots */
+    .branch-field {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .branch-field {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .branch-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-retro);
+      border-radius: 6px;
+      padding: 12px 14px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+
+    .branch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 4px 4px 0px var(--border-ink);
+    }
+
+    .branch-card.active {
+      border-color: var(--forest-dark);
+      background: #FFFDF9;
+      box-shadow: var(--shadow-active);
+    }
+
+    .branch-card.active::before {
+      content: "SELECTED GRAFT";
+      position: absolute;
+      top: -10px;
+      right: 12px;
+      background: var(--forest-dark);
+      color: #FFF;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 2px;
+      letter-spacing: 0.5px;
+    }
+
+    .branch-card.solved {
+      background: #F3F8F0;
+      border-color: var(--forest-mid);
+    }
+
+    .branch-card.pruned {
+      animation: cardShake 0.35s ease;
+    }
+
+    @keyframes cardShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+
+    .branch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .branch-index {
+      font-weight: 700;
+      color: var(--forest-dark);
+    }
+
+    .branch-clue-text {
+      font-size: 15px;
+      line-height: 1.35;
+      color: var(--ink-primary);
+      min-height: 42px;
+    }
+
+    .branch-tiles {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .herbarium-tile {
+      width: 32px;
+      height: 38px;
+      border: 1.5px solid var(--border-ink);
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      font-weight: 700;
+      background: #FFF;
+      color: var(--ink-primary);
+      box-shadow: 1px 1px 0px var(--border-ink);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .herbarium-tile.revealed {
+      background: var(--sage-light);
+      color: var(--forest-dark);
+      border-color: var(--forest-mid);
+    }
+
+    .herbarium-tile.mercy-sprout {
+      background: #FFF3DA;
+      color: #8C5D14;
+      border-color: var(--gold-accent);
+    }
+
+    .branch-lineage-preview {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-muted);
+      background: rgba(0,0,0,0.03);
+      padding: 4px 6px;
+      border-radius: 2px;
+      border-left: 3px solid var(--forest-mid);
+    }
+
+    /* Input & Herbarium Typewriter */
+    .dock-panel {
+      background: var(--bg-card);
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-retro);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .guess-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-leaf-hint {
+      background: #F4EDE0;
+      color: #8C5D14;
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.1s ease;
+    }
+
+    .btn-leaf-hint:hover:not(:disabled) {
+      background: #FFF3DA;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--border-ink);
+    }
+
+    .btn-leaf-hint:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-ink);
+    }
+
+    .btn-leaf-hint:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-style: dashed;
+      box-shadow: none;
+    }
+
+    .text-graft-input {
+      flex: 1;
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border: 2px solid var(--border-ink);
+      border-radius: 4px;
+      background: #FFF;
+      color: var(--ink-primary);
+      outline: none;
+    }
+
+    .text-graft-input:focus {
+      border-color: var(--forest-dark);
+      box-shadow: inset 2px 2px 0px rgba(0,0,0,0.05);
+    }
+
+    .btn-graft-submit {
+      background: var(--forest-dark);
+      color: #FFF;
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-sm);
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 0 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-graft-submit:hover {
+      background: var(--forest-mid);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--border-ink);
+    }
+
+    .btn-graft-submit:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-ink);
+    }
+
+    /* Virtual Keyboard */
+    .keyboard-case {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .vk-row {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .vk-key {
+      background: #FFF;
+      border: 1px solid var(--border-ink);
+      box-shadow: 1px 1px 0px var(--border-ink);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      min-width: 28px;
+      height: 38px;
+      padding: 0 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.1s ease;
+    }
+
+    .vk-key:hover {
+      background: #EFE9DC;
+    }
+
+    .vk-key.wide-key {
+      min-width: 50px;
+      font-size: 11px;
+    }
+
+    /* In-game Toast Feedback */
+    .field-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-40px);
+      background: var(--forest-dark);
+      color: #FFF;
+      padding: 8px 18px;
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-retro);
+      border-radius: 30px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+    }
+
+    .field-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .field-toast.penalty {
+      background: var(--terracotta);
+    }
+
+    /* Modal Framework */
+    .arboretum-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 36, 27, 0.72);
+      backdrop-filter: blur(2px);
+      display: none;
+      place-items: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .arboretum-modal-overlay.open {
+      display: grid;
+    }
+
+    .specimen-modal-card {
+      background: var(--bg-card);
+      border: 2.5px solid var(--border-ink);
+      box-shadow: 6px 6px 0px var(--border-ink);
+      border-radius: 8px;
+      max-width: 580px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 24px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .modal-x-btn {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--ink-primary);
+    }
+
+    .modal-headline h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      color: var(--forest-dark);
+      font-weight: 700;
+    }
+
+    .modal-headline p {
+      font-style: italic;
+      color: var(--ink-muted);
+      margin-top: 2px;
+      font-size: 15px;
+    }
+
+    /* Krillion Bell Curve Card */
+    .bell-curve-dossier {
+      background: #F1ECE0;
+      border: 1.5px solid var(--border-ink);
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bell-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .bell-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--forest-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .bell-percentile-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--terracotta);
+    }
+
+    .bell-canvas-housing {
+      width: 100%;
+      height: 125px;
+      position: relative;
+    }
+
+    #curveCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .specimen-verdict {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #FFF;
+      border: 1.5px solid var(--border-ink);
+      padding: 12px 14px;
+      border-radius: 6px;
+    }
+
+    .specimen-avatar-box {
+      width: 64px;
+      height: 64px;
+      border: 1.5px solid var(--border-ink);
+      border-radius: 4px;
+      background: #F4EFE6;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+    }
+
+    .specimen-verdict-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .specimen-class-title {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--forest-dark);
+    }
+
+    .specimen-subdetail {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    /* Lineage Breakdown */
+    .lineage-dossier-tray {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lineage-leaf-entry {
+      border-left: 3px solid var(--forest-mid);
+      background: #FFF;
+      padding: 8px 12px;
+      border: 1px solid #E2DCCF;
+      border-left-width: 3px;
+      border-radius: 3px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .leaf-entry-top {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .leaf-entry-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--forest-mid);
+    }
+
+    .leaf-entry-fact {
+      font-size: 13px;
+      color: var(--ink-muted);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    .share-deck-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-share-field {
+      flex: 1;
+      background: var(--forest-dark);
+      color: #FFF;
+      border: 2px solid var(--border-ink);
+      box-shadow: var(--shadow-sm);
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 10px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.1s ease;
+    }
+
+    .btn-share-field:hover {
+      background: var(--forest-mid);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--border-ink);
+    }
+
+    .btn-share-field:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-ink);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header>
+    <div class="brand-wrap">
+      <h1 class="brand-title">Etymon</h1>
+      <span class="specimen-pill">Specimen No. 42</span>
+    </div>
+    <div class="header-ctrls">
+      <button class="btn-field-icon" id="btnArboreumRules" title="Field Botanist's Guide">?</button>
+      <button class="btn-field-icon" id="btnHerbariumReport" title="Canopy Bell Curve">📊</button>
+    </div>
+  </header>
+
+  <!-- Main Game Layout -->
+  <main>
+    <!-- Procedural Arboretum Canopy Nursery -->
+    <section class="nursery-viewport">
+      <div class="nursery-badge">HERBARIUM CANOPY MONITOR</div>
+      
+      <div class="canopy-stats-dock">
+        <div class="stat-capsule">
+          <span>Height:</span>
+          <span class="stat-val" id="treeHeightDisplay">8.0 m</span>
+        </div>
+        <div class="stat-capsule">
+          <span>Vigor:</span>
+          <span class="stat-val" id="treeVigorDisplay">40%</span>
+        </div>
+        <div class="stat-capsule">
+          <span>☀️ Pace:</span>
+          <span class="stat-val" id="sunshineTimerDisplay">00:00</span>
+        </div>
+      </div>
+
+      <!-- SVG Living Tree Diagram -->
+      <div class="tree-stage">
+        <svg id="treeSvg" viewBox="0 0 500 240">
+          <defs>
+            <radialGradient id="canopyFoliageGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#9BC386" />
+              <stop offset="70%" stop-color="#4F7243" />
+              <stop offset="100%" stop-color="#2F482B" />
+            </radialGradient>
+            <filter id="botanicalRoughness">
+              <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.4" />
+            </filter>
+          </defs>
+
+          <!-- Earth baseline -->
+          <line x1="50" y1="225" x2="450" y2="225" stroke="#2C3529" stroke-width="2.5" stroke-dasharray="4 4" />
+          
+          <!-- Living Botanical Tree Group -->
+          <g id="livingTreeArtGroup" filter="url(#botanicalRoughness)"></g>
+        </svg>
+      </div>
+
+      <!-- Ancestral Taproot Banner -->
+      <div class="root-pedestal">
+        <span class="root-lang-tag" id="rootLanguageTag">Proto-Indo-European</span>
+        <span class="root-spelling" id="rootTermDisplay">*der-</span>
+        <span class="root-gloss" id="rootMeaningDisplay">"to split, peel, flay, tear"</span>
+      </div>
+    </section>
+
+    <!-- 4 Modern English Offshoot Word Cards -->
+    <section class="branch-field" id="branchCardsDeck"></section>
+
+    <!-- Input Interaction Deck -->
+    <section class="dock-panel">
+      <div class="guess-row">
+        <input 
+          type="text" 
+          class="text-graft-input" 
+          id="graftInput" 
+          placeholder="ENTER DESCENDANT WORD..." 
+          autocomplete="off" 
+          spellcheck="false" 
+          maxlength="14"
+        />
+        <button class="btn-leaf-hint" id="btnRequestHint" title="Prune canopy to reveal the next letter">
+          <span>🌿 Leaf Hint</span>
+          <span style="font-size: 9px; opacity: 0.85;">(-1.5m)</span>
+        </button>
+        <button class="btn-graft-submit" id="btnSubmitGraft">GRAFT BRANCH</button>
+      </div>
+
+      <!-- On-screen Typewriter Keyboard -->
+      <div class="keyboard-case">
+        <div class="vk-row" id="vkRow1"></div>
+        <div class="vk-row" id="vkRow2"></div>
+        <div class="vk-row" id="vkRow3"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- In-Game Notice Toast -->
+  <div class="field-toast" id="fieldNoticeToast">Canopy elevated!</div>
+
+  <!-- Final Results & Krillion-Style Bell Curve Modal -->
+  <div class="arboretum-modal-overlay" id="resultsModalOverlay">
+    <div class="specimen-modal-card">
+      <button class="modal-x-btn" id="btnDismissResults">&times;</button>
+      <div class="modal-headline">
+        <h2 id="resultsHeadline">Canopy Fully Flourished!</h2>
+        <p id="resultsSubhead">All modern branches have been reunited with ancestral roots.</p>
+      </div>
+
+      <!-- Specimen Summary Card -->
+      <div class="specimen-verdict">
+        <div class="specimen-avatar-box" id="specimenAvatarBadge">🌳</div>
+        <div class="specimen-verdict-text">
+          <div class="specimen-class-title" id="verdictClassLabel">Ancient Woodland Oak (16.4 m)</div>
+          <div class="specimen-subdetail" id="verdictMetaSummary">4/4 Offshoots Grafted • 1 Prune Penalty</div>
+        </div>
+      </div>
+
+      <!-- Krillion-Style Bell Curve Distribution Canvas -->
+      <div class="bell-curve-dossier">
+        <div class="bell-topbar">
+          <span class="bell-title">Global Canopy Distribution</span>
+          <span class="bell-percentile-pill" id="globalPercentileBadge">Top 12% of Botanists</span>
+        </div>
+        <div class="bell-canvas-housing">
+          <canvas id="curveCanvas"></canvas>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); text-align: center;">
+          ← Stunted Saplings (5.0m) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Global Mean (13.2m) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Apex Redwood (19.2m) →
+        </div>
+      </div>
+
+      <!-- Detailed Historical Lineage Dossier -->
+      <div style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--forest-dark); margin-top: 4px;">
+        Historical Lineage Dossier
+      </div>
+      <div class="lineage-dossier-tray" id="lineageDossierList"></div>
+
+      <!-- Botanical Feedback Module -->
+      <div class="bell-curve-dossier" style="background: #FAF6EE; border-style: dashed;" id="feedbackSection">
+        <div class="bell-topbar">
+          <span class="bell-title">Cultivator Feedback</span>
+          <span style="font-family:'JetBrains Mono'; font-size:10px; color:var(--ink-muted);">How was today's canopy?</span>
+        </div>
+        <div id="feedbackButtonsRow" style="display: flex; gap: 8px; margin-top: 4px;">
+          <button class="kb-key" id="fbThorny" style="flex:1; height:36px; font-size:12px;">🪨 Too Thorny</button>
+          <button class="kb-key" id="fbBalanced" style="flex:1; height:36px; font-size:12px;">🍃 Balanced</button>
+          <button class="kb-key" id="fbBreezy" style="flex:1; height:36px; font-size:12px;">🌸 Too Breezy</button>
+        </div>
+        <div id="feedbackThanks" style="display:none; font-family:'Fraunces', serif; font-style:italic; font-size:14px; color:var(--forest-mid); text-align:center; padding: 4px 0;">
+          Thank you! Field notes recorded for the botanical archive.
+        </div>
+        <div style="text-align: center; margin-top: 4px;">
+          <button id="btnToggleCorrection" style="background:none; border:none; color:var(--ink-muted); text-decoration:underline; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer;">
+            Flag an etymology correction or bug
+          </button>
+        </div>
+        <div id="correctionForm" style="display:none; flex-direction:column; gap:6px; margin-top:6px;">
+          <textarea id="correctionText" placeholder="Detail root or lineage discrepancy..." style="width:100%; height:50px; font-family:'Newsreader', serif; font-size:13px; padding:6px; border:1px solid var(--border-ink); border-radius:3px; resize:none;"></textarea>
+          <button class="btn-field-icon" id="btnSendCorrection" style="width:100%; height:28px; font-size:11px; background:var(--forest-dark); color:#FFF;">SUBMIT CORRECTION NOTE</button>
+        </div>
+      </div>
+
+      <!-- Share Action -->
+      <div class="share-deck-row">
+        <button class="btn-share-field" id="btnShareFieldReport">SHARE BOTANICAL REPORT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help & Botanical Rules Modal -->
+  <div class="arboretum-modal-overlay" id="helpModalOverlay">
+    <div class="specimen-modal-card">
+      <button class="modal-x-btn" id="btnDismissHelp">&times;</button>
+      <div class="modal-headline">
+        <h2>Botanist's Field Handbook</h2>
+        <p>A primer on deducing ancestral lineages and cultivating your arboretum.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px; font-size: 15px; line-height: 1.45;">
+        <p><strong>1. The Ancient Root:</strong> The banner at the base of your nursery displays a reconstructed Proto-Indo-European root. Four seemingly distinct modern English words descend from this singular historic idea.</p>
+        <p><strong>2. Tree Cultivation & Pruning:</strong>
+          <br>• <strong>Correct Word:</strong> Grafting an offshoot correctly elevates your tree canopy by <strong>+2.8 meters</strong>, thickening branches and blooming flowers.
+          <br>• <strong>Pruned Mistake:</strong> An incorrect guess withers foliage, lowers the canopy by <strong>-1.4 meters</strong>, and sprouts the next unrevealed mercy letter.
+        </p>
+        <p><strong>3. The Final Canopy Score:</strong> Conclude all 4 branches with the greatest height possible to rank against the global botanist community on the daily bell curve.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       ACOUSTIC & WOODWIND AUDIO SYNTHESIS (WEB AUDIO API)
+       ========================================================= */
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    function playHerbariumTone(freq, type = 'sine', duration = 0.16, volume = 0.1) {
+      if (audioContext.state === 'suspended') audioContext.resume();
+      try {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+        gain.gain.setValueAtTime(volume, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {}
+    }
+
+    const audioFX = {
+      tap: () => playHerbariumTone(420, 'triangle', 0.03, 0.05),
+      sprout: () => {
+        playHerbariumTone(392, 'sine', 0.16, 0.1);
+        setTimeout(() => playHerbariumTone(523.25, 'sine', 0.2, 0.1), 70);
+        setTimeout(() => playHerbariumTone(659.25, 'sine', 0.3, 0.12), 140);
+      },
+      wither: () => {
+        playHerbariumTone(300, 'sawtooth', 0.12, 0.08);
+        setTimeout(() => playHerbariumTone(220, 'sawtooth', 0.24, 0.08), 80);
+      },
+      fanfare: () => {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          setTimeout(() => playHerbariumTone(freq, 'triangle', 0.32, 0.12), i * 110);
+        });
+      }
+    };
+
+    /* =========================================================
+       CURATED BOTANICAL PUZZLE DATA
+       ========================================================= */
+    const DAILY_PUZZLE = {
+      id: 42,
+      date: "2026-11-10",
+      root: {
+        lang: "Proto-Indo-European",
+        term: "*der-",
+        meaning: "to split, peel, flay, tear"
+      },
+      targets: [
+        {
+          id: 0,
+          word: "TEAR",
+          pos: "verb",
+          clue: "To pull apart or into pieces by physical force.",
+          path: "PIE *der- → Proto-Germanic *teran → Old English teran",
+          note: "Preserved the direct physical violence of splitting materials across five millennia."
+        },
+        {
+          id: 1,
+          word: "DERMAL",
+          pos: "adjective",
+          clue: "Relating to skin, especially the sensitive living tissue beneath epidermis.",
+          path: "PIE *der- → Ancient Greek derma (peeled hide, skin)",
+          note: "The Greeks named animal hide from what remained after peeling the beast."
+        },
+        {
+          id: 2,
+          word: "TREE",
+          pos: "noun",
+          clue: "A woody perennial plant with an elongated trunk and high canopy.",
+          path: "PIE *dóru- (wood) → Germanic *trewam → Old English treow",
+          note: "Woodland trees were conceptually classified by ancient hunter-gatherers as split timber."
+        },
+        {
+          id: 3,
+          word: "TURF",
+          pos: "noun",
+          clue: "The surface layer of peat or grass cut and pared from the ground.",
+          path: "PIE *der- → Proto-Germanic *turfa → Old English turf",
+          note: "Conceived as an earthy carpet peeled off the topsoil."
+        }
+      ]
+    };
+
+    /* =========================================================
+       GAME STATE
+       ========================================================= */
+    let activeBranchIdx = 0;
+    const branchStates = DAILY_PUZZLE.targets.map(target => ({
+      word: target.word,
+      solved: false,
+      revealedIndices: new Set(),
+      mistakesMade: 0,
+      hintsUsed: 0
+    }));
+
+    let treeHeightMeters = 8.0; // Baseline starting height
+    const MIN_CANOPY = 3.0;
+    const MAX_CANOPY = 20.0;
+    let totalPrunes = 0;
+    let totalHintsUsed = 0;
+    let isGameOver = false;
+
+    /* =========================================================
+       ELAPSED SUNSHINE CHRONOMETER
+       ========================================================= */
+    let elapsedSeconds = 0;
+    let timerInterval = null;
+    const sunshineTimerDisplay = document.getElementById("sunshineTimerDisplay");
+
+    function startSunshineTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isGameOver) {
+          elapsedSeconds++;
+          const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+          const secs = String(elapsedSeconds % 60).padStart(2, '0');
+          sunshineTimerDisplay.textContent = `${mins}:${secs}`;
+        }
+      }, 1000);
+    }
+
+    /* =========================================================
+       DYNAMIC PROCEDURAL SVG TREE ENGINE
+       ========================================================= */
+    const livingTreeArtGroup = document.getElementById("livingTreeArtGroup");
+    const treeHeightDisplay = document.getElementById("treeHeightDisplay");
+    const treeVigorDisplay = document.getElementById("treeVigorDisplay");
+
+    function renderProceduralTree(growthRatio) {
+      // growthRatio is clamped 0.0 to 1.0
+      const trunkTopY = 225 - (growthRatio * 115); // ranges from 225 down to 110
+      const trunkWidth = 12 + (growthRatio * 9);
+      const canopyRadius = 24 + (growthRatio * 54);
+      const foliageFill = growthRatio > 0.35 ? "url(#canopyFoliageGrad)" : "#82664D";
+
+      let svgContent = `
+        <!-- Trunk with botanical ink grain -->
+        <path d="M 241 225 Q 245 ${trunkTopY + 30} 248 ${trunkTopY} Q 255 ${trunkTopY + 30} 259 225 Z" 
+              fill="#423123" stroke="#2C3529" stroke-width="2" />
+        
+        <!-- Left Canopy Bough -->
+        <path d="M 248 ${trunkTopY + 18} Q 200 ${trunkTopY + 2} 170 ${trunkTopY - 14}" 
+              fill="none" stroke="#423123" stroke-width="${trunkWidth * 0.45}" stroke-linecap="round" />
+        
+        <!-- Right Canopy Bough -->
+        <path d="M 252 ${trunkTopY + 22} Q 295 ${trunkTopY + 4} 330 ${trunkTopY - 10}" 
+              fill="none" stroke="#423123" stroke-width="${trunkWidth * 0.45}" stroke-linecap="round" />
+        
+        <!-- Secondary Offshoot Twigs -->
+        <path d="M 195 ${trunkTopY + 4} Q 180 ${trunkTopY - 32} 150 ${trunkTopY - 42}" 
+              fill="none" stroke="#423123" stroke-width="${trunkWidth * 0.25}" stroke-linecap="round" />
+        <path d="M 305 ${trunkTopY + 10} Q 320 ${trunkTopY - 28} 350 ${trunkTopY - 36}" 
+              fill="none" stroke="#423123" stroke-width="${trunkWidth * 0.25}" stroke-linecap="round" />
+
+        <!-- Overlapping Botanical Canopies -->
+        <circle cx="250" cy="${trunkTopY - 24}" r="${canopyRadius}" fill="${foliageFill}" stroke="#2C3529" stroke-width="2" />
+        <circle cx="165" cy="${trunkTopY - 18}" r="${canopyRadius * 0.72}" fill="${foliageFill}" stroke="#2C3529" stroke-width="2" />
+        <circle cx="335" cy="${trunkTopY - 16}" r="${canopyRadius * 0.72}" fill="${foliageFill}" stroke="#2C3529" stroke-width="2" />
+        <circle cx="210" cy="${trunkTopY - 46}" r="${canopyRadius * 0.6}" fill="${foliageFill}" stroke="#2C3529" stroke-width="1.5" />
+        <circle cx="285" cy="${trunkTopY - 44}" r="${canopyRadius * 0.6}" fill="${foliageFill}" stroke="#2C3529" stroke-width="1.5" />
+      `;
+
+      // Flowering blossoms appear when tree reaches mature height >= 14m
+      if (treeHeightMeters >= 13.5) {
+        svgContent += `
+          <circle cx="160" cy="${trunkTopY - 25}" r="4.5" fill="#E8B0A2" stroke="#2C3529" />
+          <circle cx="340" cy="${trunkTopY - 20}" r="4.5" fill="#E8B0A2" stroke="#2C3529" />
+          <circle cx="245" cy="${trunkTopY - 55}" r="5" fill="#E8B0A2" stroke="#2C3529" />
+          <circle cx="280" cy="${trunkTopY - 30}" r="4.5" fill="#E8B0A2" stroke="#2C3529" />
+        `;
+      }
+
+      livingTreeArtGroup.innerHTML = svgContent;
+      treeHeightDisplay.textContent = `${treeHeightMeters.toFixed(1)} m`;
+
+      const vigor = Math.round((treeHeightMeters / MAX_CANOPY) * 100);
+      treeVigorDisplay.textContent = `${vigor}%`;
+      treeVigorDisplay.style.color = vigor >= 50 ? 'var(--forest-dark)' : 'var(--terracotta)';
+    }
+
+    function modifyCanopyHeight(deltaMeters) {
+      treeHeightMeters = Math.max(MIN_CANOPY, Math.min(MAX_CANOPY, treeHeightMeters + deltaMeters));
+      const ratio = (treeHeightMeters - MIN_CANOPY) / (MAX_CANOPY - MIN_CANOPY);
+      renderProceduralTree(ratio);
+    }
+
+    /* =========================================================
+       BRANCH CARDS & HERBARIUM TILES
+       ========================================================= */
+    const branchCardsDeck = document.getElementById("branchCardsDeck");
+    const graftInput = document.getElementById("graftInput");
+    const btnSubmitGraft = document.getElementById("btnSubmitGraft");
+    const btnRequestHint = document.getElementById("btnRequestHint");
+
+    function updateHintButtonState() {
+      if (isGameOver) {
+        btnRequestHint.disabled = true;
+        return;
+      }
+      const curBranch = branchStates[activeBranchIdx];
+      if (!curBranch || curBranch.solved) {
+        btnRequestHint.disabled = true;
+        return;
+      }
+      // Check if all letters are already revealed
+      const targetWord = curBranch.word;
+      const allRevealed = targetWord.split("").every((_, i) => curBranch.revealedIndices.has(i));
+      btnRequestHint.disabled = allRevealed;
+    }
+
+    function renderBranchCards() {
+      branchCardsDeck.innerHTML = "";
+      DAILY_PUZZLE.targets.forEach((target, idx) => {
+        const state = branchStates[idx];
+        const card = document.createElement("div");
+        card.id = `branchCard_${idx}`;
+        card.className = `branch-card ${idx === activeBranchIdx ? 'active' : ''} ${state.solved ? 'solved' : ''}`;
+        card.onclick = () => activateBranch(idx);
+
+        let tilesHtml = "";
+        for (let cIdx = 0; cIdx < target.word.length; cIdx++) {
+          const char = target.word[cIdx];
+          const isRevealed = state.solved || state.revealedIndices.has(cIdx);
+          const isMercy = state.revealedIndices.has(cIdx) && !state.solved;
+          tilesHtml += `
+            <div class="herbarium-tile ${isRevealed ? (isMercy ? 'mercy-sprout' : 'revealed') : ''}">
+              ${isRevealed ? char : ''}
+            </div>
+          `;
+        }
+
+        let statusText = `${target.word.length} LETTERS`;
+        if (state.solved) {
+          if (state.hintsUsed > 0) statusText = '✓ GRAFTED (HINTED)';
+          else if (state.mistakesMade > 0) statusText = '✓ RECOVERED';
+          else statusText = '★ PURE GRAFT';
+        }
+
+        card.innerHTML = `
+          <div class="branch-header">
+            <span class="branch-index">BRANCH 0${idx + 1} (${target.pos.toUpperCase()})</span>
+            <span>${statusText}</span>
+          </div>
+          <div class="branch-clue-text">${target.clue}</div>
+          <div class="branch-tiles">${tilesHtml}</div>
+          ${state.solved ? `<div class="branch-lineage-preview">${target.path}</div>` : ''}
+        `;
+
+        branchCardsDeck.appendChild(card);
+      });
+      updateHintButtonState();
+    }
+
+    function activateBranch(idx) {
+      if (branchStates[idx].solved) return;
+      activeBranchIdx = idx;
+      renderBranchCards();
+      graftInput.focus();
+      audioFX.tap();
+    }
+
+    function notify(text, isError = false) {
+      const toast = document.getElementById("fieldNoticeToast");
+      toast.textContent = text;
+      toast.className = `field-toast visible ${isError ? 'penalty' : ''}`;
+      setTimeout(() => {
+        toast.className = 'field-toast';
+      }, 2400);
+    }
+
+    /* =========================================================
+       GRAFT GUESS LOGIC
+       ========================================================= */
+    function evaluateGraft() {
+      if (isGameOver) return;
+      const rawGuess = graftInput.value.trim().toUpperCase();
+      graftInput.value = "";
+      if (!rawGuess) return;
+
+      const currentBranch = branchStates[activeBranchIdx];
+      const targetWord = currentBranch.word;
+
+      if (rawGuess === targetWord) {
+        // SOLVED: Elevate Tree Canopy
+        currentBranch.solved = true;
+        modifyCanopyHeight(+2.8);
+        audioFX.sprout();
+        notify(`Branch 0${activeBranchIdx + 1} Grafted! (+2.8m Canopy)`);
+
+        // Check if full specimen is solved
+        const allDone = branchStates.every(b => b.solved);
+        if (allDone) {
+          isGameOver = true;
+          if (timerInterval) clearInterval(timerInterval);
+
+          // Apply Sunshine Pace Bonus
+          let sunshineBonus = 0.0;
+          let sunTier = "Overcast Growth (+0.0m)";
+          if (elapsedSeconds < 60) {
+            sunshineBonus = 2.0;
+            sunTier = "Full Sun (+2.0m)";
+          } else if (elapsedSeconds <= 120) {
+            sunshineBonus = 1.0;
+            sunTier = "Partial Sun (+1.0m)";
+          }
+
+          if (sunshineBonus > 0) {
+            modifyCanopyHeight(sunshineBonus);
+          }
+
+          audioFX.fanfare();
+          try {
+            confetti({
+              particleCount: 65,
+              spread: 60,
+              origin: { y: 0.65 },
+              colors: ['#4F7243', '#789B66', '#BA4E36', '#FAF6EE']
+            });
+          } catch(e) {}
+          setTimeout(() => displayResultsDossier(sunTier, sunshineBonus), 1000);
+        } else {
+          // Advance to next unsolved branch
+          const nextIdx = branchStates.findIndex(b => !b.solved);
+          if (nextIdx !== -1) activeBranchIdx = nextIdx;
+        }
+      } else {
+        // PENALTY: Prune Tree by -1.0m, track mistake, but DO NOT auto-reveal letters
+        totalPrunes++;
+        currentBranch.mistakesMade++;
+        modifyCanopyHeight(-1.0);
+        audioFX.wither();
+
+        const cardEl = document.getElementById(`branchCard_${activeBranchIdx}`);
+        if (cardEl) {
+          cardEl.classList.add('pruned');
+          setTimeout(() => cardEl.classList.remove('pruned'), 400);
+        }
+
+        notify(`Incorrect: "${rawGuess}" (-1.0m Canopy). Try again!`, true);
+      }
+
+      renderBranchCards();
+    }
+
+    /* =========================================================
+       MANUAL LEAF HINT SYSTEM
+       ========================================================= */
+    function requestLeafHint() {
+      if (isGameOver) return;
+      const currentBranch = branchStates[activeBranchIdx];
+      if (!currentBranch || currentBranch.solved) return;
+
+      const targetWord = currentBranch.word;
+      let revealedLetter = null;
+      let slotIndex = -1;
+
+      for (let i = 0; i < targetWord.length; i++) {
+        if (!currentBranch.revealedIndices.has(i)) {
+          currentBranch.revealedIndices.add(i);
+          revealedLetter = targetWord[i];
+          slotIndex = i;
+          break;
+        }
+      }
+
+      if (revealedLetter !== null) {
+        currentBranch.hintsUsed++;
+        totalHintsUsed++;
+        modifyCanopyHeight(-1.5);
+        audioFX.tap();
+        notify(`Leaf Hint: Sprouted '${revealedLetter}' (-1.5m Pruning Cost)`, false);
+        renderBranchCards();
+      } else {
+        notify("All letters already revealed for this branch!", true);
+      }
+    }
+
+    btnSubmitGraft.onclick = evaluateGraft;
+    btnRequestHint.onclick = requestLeafHint;
+    graftInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") evaluateGraft();
+    });
+
+    /* =========================================================
+       ON-SCREEN TYPEWRITER KEYBOARD
+       ========================================================= */
+    const KEYBOARD_GRID = [
+      ["Q","W","E","R","T","Y","U","I","O","P"],
+      ["A","S","D","F","G","H","J","K","L"],
+      ["ENTER","Z","X","C","V","B","N","M","DEL"]
+    ];
+
+    function initializeKeyboard() {
+      KEYBOARD_GRID.forEach((row, rowIdx) => {
+        const rowContainer = document.getElementById(`vkRow${rowIdx + 1}`);
+        row.forEach(char => {
+          const keyBtn = document.createElement("button");
+          keyBtn.className = `vk-key ${char.length > 1 ? 'wide-key' : ''}`;
+          keyBtn.textContent = char;
+          keyBtn.onclick = () => {
+            audioFX.tap();
+            if (char === "ENTER") {
+              evaluateGraft();
+            } else if (char === "DEL") {
+              graftInput.value = graftInput.value.slice(0, -1);
+            } else {
+              if (graftInput.value.length < 14) graftInput.value += char;
+            }
+          };
+          rowContainer.appendChild(keyBtn);
+        });
+      });
+    }
+
+    /* =========================================================
+       KRILLION-STYLE GAUSSIAN BELL CURVE
+       ========================================================= */
+    function renderGlobalBellCurve(userHeightMeters) {
+      const canvas = document.getElementById("curveCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Handle high-resolution screens
+      const box = canvas.getBoundingClientRect();
+      canvas.width = box.width * window.devicePixelRatio;
+      canvas.height = box.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      const W = box.width;
+      const H = box.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // Population mean = 13.2m, standard deviation = 2.8m
+      const mean = 13.2;
+      const sd = 2.8;
+      const minX = 4.0;
+      const maxX = 20.0;
+
+      function gaussianPdf(x) {
+        return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / sd, 2));
+      }
+
+      const curveCoordinates = [];
+      const resolution = 70;
+      const peakPdf = gaussianPdf(mean);
+
+      for (let i = 0; i <= resolution; i++) {
+        const currentVal = minX + (i / resolution) * (maxX - minX);
+        const yVal = gaussianPdf(currentVal);
+        const plotX = (i / resolution) * (W - 32) + 16;
+        const plotY = H - 22 - (yVal / peakPdf) * (H - 40);
+        curveCoordinates.push({ x: plotX, y: plotY, score: currentVal });
+      }
+
+      // Draw Bell Area Fill
+      ctx.beginPath();
+      ctx.moveTo(curveCoordinates[0].x, H - 22);
+      curveCoordinates.forEach(pt => ctx.lineTo(pt.x, pt.y));
+      ctx.lineTo(curveCoordinates[curveCoordinates.length - 1].x, H - 22);
+      ctx.fillStyle = "rgba(79, 114, 67, 0.16)";
+      ctx.fill();
+
+      // Draw Bell Curve Stroke
+      ctx.beginPath();
+      ctx.moveTo(curveCoordinates[0].x, curveCoordinates[0].y);
+      curveCoordinates.forEach(pt => ctx.lineTo(pt.x, pt.y));
+      ctx.strokeStyle = "#4F7243";
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+
+      // Earth Ground Baseline
+      ctx.beginPath();
+      ctx.moveTo(10, H - 22);
+      ctx.lineTo(W - 10, H - 22);
+      ctx.strokeStyle = "#2C3529";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Mark the User's Position
+      const boundedScore = Math.max(minX, Math.min(maxX, userHeightMeters));
+      const userRatio = (boundedScore - minX) / (maxX - minX);
+      const userPlotX = userRatio * (W - 32) + 16;
+      const userPdf = gaussianPdf(boundedScore);
+      const userPlotY = H - 22 - (userPdf / peakPdf) * (H - 40);
+
+      // Pinned Indicator Needle
+      ctx.beginPath();
+      ctx.setLineDash([3, 3]);
+      ctx.moveTo(userPlotX, H - 22);
+      ctx.lineTo(userPlotX, userPlotY - 6);
+      ctx.strokeStyle = "#BA4E36";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Needle Head Dot
+      ctx.beginPath();
+      ctx.arc(userPlotX, userPlotY - 6, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#BA4E36";
+      ctx.fill();
+      ctx.strokeStyle = "#2C3529";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Badge Label
+      ctx.font = "bold 10px 'JetBrains Mono'";
+      ctx.fillStyle = "#BA4E36";
+      ctx.textAlign = "center";
+      ctx.fillText(`YOU (${userHeightMeters.toFixed(1)}m)`, userPlotX, userPlotY - 14);
+    }
+
+    /* =========================================================
+       MODALS & SHARING
+       ========================================================= */
+    const resultsModalOverlay = document.getElementById("resultsModalOverlay");
+    const helpModalOverlay = document.getElementById("helpModalOverlay");
+
+    function displayResultsDossier(sunTier = "Standard Pace", sunshineBonus = 0) {
+      let rankTitle = "Great Woodland Oak";
+      let icon = "🌳";
+      let percentileTag = "Top 18% of Botanists";
+
+      if (treeHeightMeters >= 16.5) {
+        rankTitle = "Apex Ancient Redwood";
+        icon = "🌲";
+        percentileTag = "Top 5% of Botanists (Grand Arbiter)";
+      } else if (treeHeightMeters >= 13.0) {
+        rankTitle = "Mature Forest Oak";
+        icon = "🌳";
+        percentileTag = "Top 22% of Botanists";
+      } else {
+        rankTitle = "Weathered Orchard Birch";
+        icon = "🌿";
+        percentileTag = "Mid-tier Specimen";
+      }
+
+      const mins = Math.floor(elapsedSeconds / 60);
+      const secs = elapsedSeconds % 60;
+      const timeStr = `${mins}m ${secs}s`;
+
+      document.getElementById("specimenAvatarBadge").textContent = icon;
+      document.getElementById("verdictClassLabel").textContent = `${rankTitle} (${treeHeightMeters.toFixed(1)} m)`;
+      document.getElementById("verdictMetaSummary").textContent = `4/4 Offshoots • ${totalPrunes} Mistake(s) • ${totalHintsUsed} Hint(s) • Time: ${timeStr} [${sunTier}]`;
+      document.getElementById("globalPercentileBadge").textContent = percentileTag;
+
+      // Render Lineage Breakdown List
+      const lineageContainer = document.getElementById("lineageDossierList");
+      lineageContainer.innerHTML = "";
+      DAILY_PUZZLE.targets.forEach((target, i) => {
+        const item = document.createElement("div");
+        item.className = "lineage-leaf-entry";
+        const state = branchStates[i];
+
+        let graftBadge = "★ Pure Graft";
+        let graftColor = "var(--forest-mid)";
+        if (state.hintsUsed > 0) {
+          graftBadge = `🌿 Hinted (${state.hintsUsed})`;
+          graftColor = "var(--gold-accent)";
+        } else if (state.mistakesMade > 0) {
+          graftBadge = `${state.mistakesMade} Mistake(s)`;
+          graftColor = "var(--terracotta)";
+        }
+
+        item.innerHTML = `
+          <div class="leaf-entry-top">
+            <span>${target.word} (${target.pos})</span>
+            <span style="font-family:'JetBrains Mono'; font-size:10px; color:${graftColor};">
+              ${graftBadge}
+            </span>
+          </div>
+          <div class="leaf-entry-path">${target.path}</div>
+          <div class="leaf-entry-fact">"${target.note}"</div>
+        `;
+        lineageContainer.appendChild(item);
+      });
+
+      resultsModalOverlay.classList.add("open");
+      setTimeout(() => renderGlobalBellCurve(treeHeightMeters), 120);
+    }
+
+    /* Botanical Feedback Actions */
+    function recordFeedback(rating) {
+      audioFX.tap();
+      document.getElementById("feedbackButtonsRow").style.display = "none";
+      document.getElementById("feedbackThanks").style.display = "block";
+      localStorage.setItem(`etymon_feedback_${DAILY_PUZZLE.id}`, rating);
+    }
+
+    document.getElementById("fbThorny").onclick = () => recordFeedback("thorny");
+    document.getElementById("fbBalanced").onclick = () => recordFeedback("balanced");
+    document.getElementById("fbBreezy").onclick = () => recordFeedback("breezy");
+
+    document.getElementById("btnToggleCorrection").onclick = () => {
+      const form = document.getElementById("correctionForm");
+      form.style.display = form.style.display === "flex" ? "none" : "flex";
+    };
+
+    document.getElementById("btnSendCorrection").onclick = () => {
+      const txt = document.getElementById("correctionText").value.trim();
+      if (!txt) return;
+      audioFX.tap();
+      document.getElementById("correctionForm").style.display = "none";
+      document.getElementById("btnToggleCorrection").textContent = "✓ Correction note archived for review";
+      notify("Correction submitted to botanical records!");
+    };
+
+    document.getElementById("btnDismissResults").onclick = () => resultsModalOverlay.classList.remove("open");
+    document.getElementById("btnArboreumRules").onclick = () => helpModalOverlay.classList.add("open");
+    document.getElementById("btnDismissHelp").onclick = () => helpModalOverlay.classList.remove("open");
+    document.getElementById("btnHerbariumReport").onclick = () => displayResultsDossier();
+
+    document.getElementById("btnShareFieldReport").onclick = () => {
+      const mins = Math.floor(elapsedSeconds / 60);
+      const secs = elapsedSeconds % 60;
+      
+      // Share grid logic:
+      // 🟩 = Pure Graft (0 mistakes, 0 hints)
+      // 🟧 = Recovered (mistakes made, 0 hints)
+      // 🟨 = Leaf Hint Used (>0 hints)
+      const shareTiles = branchStates.map(b => {
+        if (b.hintsUsed > 0) return '🟨';
+        if (b.mistakesMade > 0) return '🟧';
+        return '🟩';
+      }).join('');
+
+      const shareText = `Etymon #42 — Arboreum Specimen
+Root: *der- ("to split, peel")
+🌳 Final Canopy: ${treeHeightMeters.toFixed(1)} meters
+☀️ Time: ${mins}m ${secs}s
+🌿 Hints: ${totalHintsUsed} | 🍂 Mistakes: ${totalPrunes}
+${shareTiles}
+https://etymongame.com`;
+
+      const tempArea = document.createElement("textarea");
+      tempArea.value = shareText;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand("copy");
+        notify("Botanical Report copied to clipboard!");
+      } catch (err) {
+        notify("Clipboard copy unavailable", true);
+      }
+      document.body.removeChild(tempArea);
+    };
+
+    /* =========================================================
+       BOOTSTRAP APPLICATION
+       ========================================================= */
+    window.onload = function() {
+      renderProceduralTree(0.35); // 8m start
+      renderBranchCards();
+      initializeKeyboard();
+      startSunshineTimer();
+    };
+  </script>
+</body>
+</html>
