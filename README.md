@@ -2,7 +2,7 @@
 
 > A daily word deduction game linking modern English words back to their prehistoric ancestral roots.
 
-Play live: **[Your GitHub Pages Link Here]**
+[Play live](https://sydney-o-connor.github.io/etymon-game/)
 
 ---
 
