@@ -994,60 +994,51 @@
     };
 
     /* =========================================================
-   DAILY PUZZLE ROTATION ENGINE
-   ========================================================= */
-
-// 1. Launch anchor date
-const GAME_EPOCH = new Date("2026-11-10T00:00:00").getTime();
-
-// 2. Queue up scheduled puzzles in order
-const PUZZLE_ARCHIVE = [
-  {
-    id: 1,
-    root: { lang: "Proto-Indo-European", term: "*der-", meaning: "to split, peel, flay, tear" },
-    targets: [
-      { id: 0, word: "TEAR", pos: "verb", clue: "To pull apart or into pieces by sudden force.", path: "PIE *der- → Proto-Germanic *teran → Old English teran", fact: "Preserved the direct physical meaning of splitting over 5,000 years." },
-      { id: 1, word: "DERMAL", pos: "adjective", clue: "Relating to skin, especially the sensitive layer below the cuticle.", path: "PIE *der- → Ancient Greek derma (hide, peeled skin)", fact: "Ancient Greeks called hide 'derma' from what was peeled off an animal." },
-      { id: 2, word: "TREE", pos: "noun", clue: "Perennial woody plant with an elongated stem or trunk.", path: "PIE *dóru- (wood) → Germanic *trewam → Old English treow", fact: "Originally named from wood that could be split and hewn into timber." },
-      { id: 3, word: "TURF", pos: "noun", clue: "Surface peat or grassy soil pared from the earth.", path: "PIE *der- → Proto-Germanic *turfa → Old English turf", fact: "Conceived as an earthy slice 'peeled' off the meadow." }
-    ]
-  },
-  {
-    id: 2,
-    root: { lang: "Proto-Indo-European", term: "*bhel-", meaning: "to shine, burn, flash" },
-    targets: [
-      { id: 0, word: "FLAME", pos: "noun", clue: "A hot, glowing body of ignited gas.", path: "PIE *bhel- → Latin flamma → Old French flame", fact: "Shifted through Latin with an added 'm' formative for fire." },
-      { id: 1, word: "BLEACH", pos: "verb", clue: "To whiten by exposure to sunlight or chemical process.", path: "PIE *bhel- → Germanic *blaikjan → Old English blæcan", fact: "To make something 'shine' or become pale white." },
-      { id: 2, word: "BLOND", pos: "adjective", clue: "Fair-haired or pale yellow in complexion.", path: "PIE *bhel- → Medieval Latin blondus → Old French blond", fact: "Applied to flaxen hair resembling bleached wool or sunlight." },
-      { id: 3, word: "PHLOX", pos: "noun", clue: "A North American plant cultivated for fragrant, bright flowers.", path: "PIE *bhel- → Ancient Greek phlox (flame, fiery blossom)", fact: "Named by Linnaeus for the fiery hue of its petals." }
-    ]
-  },
-  {
-    id: 3,
-    root: { lang: "Proto-Indo-European", term: "*gno-", meaning: "to know, recognize" },
-    targets: [
-      { id: 0, word: "KNOW", pos: "verb", clue: "To perceive directly or have cognitive awareness of.", path: "PIE *gno- → Germanic *knew- → Old English cnawan", fact: "Retained the initial silent 'k' in English spelling." },
-      { id: 1, word: "IGNORE", pos: "verb", clue: "To deliberately pay no attention to; disregard.", path: "PIE *gno- → Latin ignorare (not to know)", fact: "Prefix 'in-' (not) + *gno- literally meant 'to be willfully ignorant of'." },
-      { id: 2, word: "NOBLE", pos: "adjective", clue: "Belonging to a hereditary class with high social or political status.", path: "PIE *gno- → Latin nobilis (well-known, famous)", fact: "Nobility originally signified being publicly 'recognized'." },
-      { id: 3, word: "DIAGNOSIS", pos: "noun", clue: "The identification of the nature of an illness by examination.", path: "PIE *gno- → Ancient Greek diagnosis (discerning, distinguishing)", fact: "Greek 'dia-' (thoroughly) + 'gnosis' (knowing)." }
-    ]
-  }
-];
-
-// 3. Compute today's active puzzle index based on local midnight
-function getTodaysPuzzle() {
-  const now = new Date();
-  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const dayIndex = Math.floor((todayMidnight - GAME_EPOCH) / (1000 * 60 * 60 * 24));
-  
-  // Guard against dates prior to launch
-  const safeIndex = Math.max(0, dayIndex);
-  
-  // Wrap around using modulo so the game never crashes when you run out
-  return PUZZLE_ARCHIVE[safeIndex % PUZZLE_ARCHIVE.length];
-}
-
-const PUZZLE_DATA = getTodaysPuzzle();
+    CURATED BOTANICAL PUZZLE DATA
+       ========================================================= */
+    const DAILY_PUZZLE = {
+      id: 42,
+      date: "2026-11-10",
+      root: {
+        lang: "Proto-Indo-European",
+        term: "*der-",
+        meaning: "to split, peel, flay, tear"
+      },
+      targets: [
+        {
+          id: 0,
+          word: "TEAR",
+          pos: "verb",
+          clue: "To pull apart or into pieces by physical force.",
+          path: "PIE *der- → Proto-Germanic *teran → Old English teran",
+          note: "Preserved the direct physical violence of splitting materials across five millennia."
+        },
+        {
+          id: 1,
+          word: "DERMAL",
+          pos: "adjective",
+          clue: "Relating to skin, especially the sensitive living tissue beneath epidermis.",
+          path: "PIE *der- → Ancient Greek derma (peeled hide, skin)",
+          note: "The Greeks named animal hide from what remained after peeling the beast."
+        },
+        {
+          id: 2,
+          word: "TREE",
+          pos: "noun",
+          clue: "A woody perennial plant with an elongated trunk and high canopy.",
+          path: "PIE *dóru- (wood) → Germanic *trewam → Old English treow",
+          note: "Woodland trees were conceptually classified by ancient hunter-gatherers as split timber."
+        },
+        {
+          id: 3,
+          word: "TURF",
+          pos: "noun",
+          clue: "The surface layer of peat or grass cut and pared from the ground.",
+          path: "PIE *der- → Proto-Germanic *turfa → Old English turf",
+          note: "Conceived as an earthy carpet peeled off the topsoil."
+        }
+      ]
+    };
 
     /* =========================================================
        GAME STATE
